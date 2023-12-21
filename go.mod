@@ -1,4 +1,4 @@
-module encore.app
+module github.com/dsha256/packer-pro
 
 go 1.21.5
 
