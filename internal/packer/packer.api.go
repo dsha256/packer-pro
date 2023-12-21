@@ -1,7 +1,8 @@
-package packet
+package packer
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 )
 
