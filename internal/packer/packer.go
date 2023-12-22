@@ -55,12 +55,7 @@ func initPacker() (*Packer, error) {
 	entClient := entity.NewClient(entity.Driver(dbDriver))
 	packer.entity = entClient
 
-	err := cleanUpSortedSizesCache(ctx)
-	if err != nil {
-		return &Packer{}, err
-	}
-
-	err = refreshSortedSizesCacheFromDB(ctx, packer.entity)
+	err := refreshSortedSizesCacheFromDB(ctx, packer.entity)
 	if err != nil {
 		return &Packer{}, err
 	}
