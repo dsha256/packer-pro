@@ -86,6 +86,7 @@ func (packer *Packer) ListSizes(ctx context.Context) (*ListSizesResp, error) {
 	return &response, nil
 }
 
+// PostSizesReq ...
 type PostSizesReq struct {
 	Sizes []int `json:"sizes"`
 }
@@ -103,6 +104,7 @@ func (req *PostSizesReq) Validate() error {
 	return nil
 }
 
+// PostSizesResp ...
 type PostSizesResp struct {
 	SortedSizes []int `json:"sorted_sizes"`
 }
