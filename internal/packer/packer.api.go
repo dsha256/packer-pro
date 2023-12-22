@@ -13,6 +13,8 @@ var (
 	ErrorInvalidItems = errors.New("items must be a positive number")
 	// ErrDuplicatedSizes ..
 	ErrDuplicatedSizes = errors.New("sizes must be uniq")
+	// ErrEmptySizes ...
+	ErrEmptySizes = errors.New("sizes must contain 1 or more elements")
 )
 
 // GetPacketsReq ...
@@ -93,6 +95,10 @@ type PostSizesReq struct {
 
 // Validate validates PostSizesReq.
 func (req *PostSizesReq) Validate() error {
+	if len(req.Sizes) < 1 {
+		return ErrEmptySizes
+	}
+
 	weights := make(map[int]int)
 	for _, size := range req.Sizes {
 		if _, exists := weights[size]; exists {
