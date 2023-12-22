@@ -47,6 +47,7 @@ type Packer struct {
 	entity *entity.Client
 }
 
+//lint:ignore U1000 This function is used by Encore to init the service.
 func initPacker() (*Packer, error) {
 	packer := Packer{}
 	ctx := context.Background()
