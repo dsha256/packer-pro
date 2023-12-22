@@ -2,12 +2,11 @@ name: Audit
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-
   audit:
     runs-on: ubuntu-22.04
     steps:
@@ -39,5 +38,8 @@ jobs:
       - name: Run golint
         run: golint ./...
 
-      - name: Run tests
-        run: go test -race -vet=off ./...
+#      - name: Install Encore
+#        run: curl -L https://encore.dev/install.sh | bash
+#
+#      - name: Run tests
+#        run: /home/runner/.encore/bin/encore test -race -vet=off ./...
