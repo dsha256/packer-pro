@@ -9,7 +9,7 @@ generate: ## Generates all scenarios.
 	go generate ./...
 
 encore-conn-uri: ## Get encore-managed DB URI.
-	encore db conn-uri -v billing
+	encore db conn-uri -v packer
 
 help: ## Prints this message.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
