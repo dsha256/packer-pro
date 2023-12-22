@@ -1,5 +1,12 @@
 package packer
 
+import (
+	"context"
+
+	"github.com/dsha256/packer-pro/internal/entity"
+	entitysize "github.com/dsha256/packer-pro/internal/entity/size"
+)
+
 // getMinNecessaryPacks calculates minimum packs quantity for given items based on packs sizes.
 func getMinNecessaryPacks(items int, sortedSizes []int) map[int]int {
 	necessaryPacks := make(map[int]int)
@@ -39,4 +46,31 @@ func getMinNecessaryPacks(items int, sortedSizes []int) map[int]int {
 	}
 
 	return necessaryPacks
+}
+
+// cleanUpSortedSizesCache cleans up the redis cluster's keyspace dedicated for SortedSizes.
+func cleanUpSortedSizesCache(ctx context.Context) error {
+	_, err := SortedSizes.Delete(ctx, sortedSizesKey)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// refreshSortedSizesCacheFromDB retrieves sorted sizes from the db and caches them.
+func refreshSortedSizesCacheFromDB(ctx context.Context, entity *entity.Client) error {
+	allSizes, err := entity.Size.Query().Select(entitysize.FieldSize).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, size := range allSizes {
+		_, err = SortedSizes.PushRight(ctx, sortedSizesKey, size.Size)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

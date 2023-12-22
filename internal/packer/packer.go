@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/dsha256/packer-pro/internal/entity"
-	entitysize "github.com/dsha256/packer-pro/internal/entity/size"
 )
 
 const sortedSizesKeyName = "SortedSizes"
@@ -56,21 +55,14 @@ func initPacker() (*Packer, error) {
 	entClient := entity.NewClient(entity.Driver(dbDriver))
 	packer.entity = entClient
 
-	allSizes, err := packer.entity.Size.Query().Select(entitysize.FieldSize).All(ctx)
+	err := cleanUpSortedSizesCache(ctx)
 	if err != nil {
 		return &Packer{}, err
 	}
 
-	_, err = SortedSizes.Delete(ctx, sortedSizesKey)
+	err = refreshSortedSizesCacheFromDB(ctx, packer.entity)
 	if err != nil {
 		return &Packer{}, err
-	}
-
-	for _, size := range allSizes {
-		_, err = SortedSizes.PushRight(ctx, sortedSizesKey, size.Size)
-		if err != nil {
-			return &Packer{}, err
-		}
 	}
 
 	return &packer, nil

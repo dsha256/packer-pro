@@ -40,3 +40,43 @@ func (packer *Packer) GetPackets(ctx context.Context, items *GetPacketsReq) (*Ge
 
 	return &response, nil
 }
+
+// ListSizesResp ...
+type ListSizesResp struct {
+	SortedSizes []int `query:"sorted_sizes"`
+}
+
+//encore:api public method=GET path=/api/v1/packets/sizes
+func (packer *Packer) ListSizes(ctx context.Context) (*ListSizesResp, error) {
+	var response ListSizesResp
+	ss, err := SortedSizes.Items(ctx, sortedSizesKey)
+	if err != nil {
+		return &response, err
+	}
+
+	// If sorted sizes cashing time is expired, sorted sizes will be retrieved from the DB and then cashed again.
+	if len(ss) == 0 {
+		// making sure about cache clean up to avoid duplicated sizes in the cache
+		err = cleanUpSortedSizesCache(ctx)
+		if err != nil {
+			return &response, err
+		}
+
+		err = refreshSortedSizesCacheFromDB(ctx, packer.entity)
+		if err != nil {
+			return &response, err
+		}
+
+		ss, err = SortedSizes.Items(ctx, sortedSizesKey)
+		if err != nil {
+			return &response, err
+		}
+		response.SortedSizes = ss
+
+		return &response, nil
+	}
+
+	response.SortedSizes = ss
+
+	return &response, nil
+}
