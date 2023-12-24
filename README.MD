@@ -30,6 +30,10 @@ encore run
 * #### Development Dashboard http://localhost:9400/packer-pro-da22
 
 ---
+# 🌩️ Run on the cloud (AWS/GCP)
+### You just need to creat Encore app, connect it to your cloud account and deploy the app in few straightforward clicks: https://encore.dev/docs/deploy/deploying 
+
+---
 
 # 🔥 Want to give it a shot?
 ### Please go to the docs page where you can test the functionality out in real time.
