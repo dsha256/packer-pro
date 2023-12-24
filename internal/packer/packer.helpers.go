@@ -61,7 +61,7 @@ func refreshSortedSizesCacheFromDB(ctx context.Context, entity *entity.Client) e
 	}
 
 	for _, size := range allSizes {
-		_, err = SortedSizes.PushRight(ctx, sortedSizesKey, size.Size)
+		_, err = SortedSizesCache.PushRight(ctx, sortedSizesKey, size.Size)
 		if err != nil {
 			return err
 		}
@@ -70,9 +70,9 @@ func refreshSortedSizesCacheFromDB(ctx context.Context, entity *entity.Client) e
 	return nil
 }
 
-// cleanUpSortedSizesCache cleans up the redis cluster's keyspace dedicated for SortedSizes.
+// cleanUpSortedSizesCache cleans up the redis cluster's keyspace dedicated for SortedSizesCache.
 func cleanUpSortedSizesCache(ctx context.Context) error {
-	_, err := SortedSizes.Delete(ctx, sortedSizesKey)
+	_, err := SortedSizesCache.Delete(ctx, sortedSizesKey)
 	if err != nil {
 		return err
 	}
@@ -80,10 +80,10 @@ func cleanUpSortedSizesCache(ctx context.Context) error {
 	return nil
 }
 
-// refreshSortedSizesCache ...
+// refreshSortedSizesCache sets new sorted sizes to SortedSizesCache.
 func refreshSortedSizesCache(ctx context.Context, sortedSizes []int) error {
 	for _, size := range sortedSizes {
-		_, err := SortedSizes.PushRight(ctx, sortedSizesKey, size)
+		_, err := SortedSizesCache.PushRight(ctx, sortedSizesKey, size)
 		if err != nil {
 			return err
 		}
@@ -92,6 +92,7 @@ func refreshSortedSizesCache(ctx context.Context, sortedSizes []int) error {
 	return nil
 }
 
+// cleanUpDBSizes deletes all the sizes stored in the DB.
 func cleanUpDBSizes(ctx context.Context, entity *entity.Client) error {
 	_, err := entity.Size.Delete().Where().Exec(ctx)
 	if err == nil {
