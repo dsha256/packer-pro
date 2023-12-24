@@ -5,12 +5,13 @@ import (
 	"errors"
 	"slices"
 
+	"encore.dev/storage/cache"
 	"github.com/dsha256/packer-pro/internal/entity"
 )
 
 var (
-	// ErrorInvalidItems ...
-	ErrorInvalidItems = errors.New("items must be a positive number")
+	// ErrorNegativeItems ...
+	ErrorNegativeItems = errors.New("items must be a positive number")
 	// ErrDuplicatedSizes ..
 	ErrDuplicatedSizes = errors.New("sizes must be uniq")
 	// ErrEmptySizes ...
@@ -25,7 +26,7 @@ type GetPacketsReq struct {
 // Validate validates GetPacketsReq.
 func (req *GetPacketsReq) Validate() error {
 	if req.Items <= 0 {
-		return ErrorInvalidItems
+		return ErrorNegativeItems
 	}
 
 	return nil
@@ -39,12 +40,29 @@ type GetPacketsResp struct {
 //encore:api public method=GET path=/api/v1/packets
 func (packer *Packer) GetPackets(ctx context.Context, items *GetPacketsReq) (*GetPacketsResp, error) {
 	var response GetPacketsResp
-	ss, err := SortedSizes.Items(ctx, sortedSizesKey)
-	if err != nil {
+
+	key := CalculatedSizesKey{Items: items.Items}
+	calculatedPacks, err := CalculatedPacksCache.Get(ctx, key)
+	if err != nil && !errors.Is(err, cache.Miss) {
 		return &response, err
 	}
-	response.Packets = getMinNecessaryPacks(items.Items, ss)
 
+	if errors.Is(err, cache.Miss) {
+		ss, err := SortedSizesCache.Items(ctx, sortedSizesKey)
+		if err != nil {
+			return &response, err
+		}
+		necessaryPacks := getMinNecessaryPacks(items.Items, ss)
+		response.Packets = necessaryPacks
+
+		err = CalculatedPacksCache.Set(ctx, key, GetPacketsResp{Packets: necessaryPacks})
+		if err != nil {
+			return &response, err
+		}
+
+		return &response, err
+	}
+	response.Packets = calculatedPacks.Packets
 	return &response, nil
 }
 
@@ -56,7 +74,7 @@ type ListSizesResp struct {
 //encore:api public method=GET path=/api/v1/packets/sizes
 func (packer *Packer) ListSizes(ctx context.Context) (*ListSizesResp, error) {
 	var response ListSizesResp
-	ss, err := SortedSizes.Items(ctx, sortedSizesKey)
+	ss, err := SortedSizesCache.Items(ctx, sortedSizesKey)
 	if err != nil {
 		return &response, err
 	}
@@ -74,7 +92,7 @@ func (packer *Packer) ListSizes(ctx context.Context) (*ListSizesResp, error) {
 			return &response, err
 		}
 
-		ss, err = SortedSizes.Items(ctx, sortedSizesKey)
+		ss, err = SortedSizesCache.Items(ctx, sortedSizesKey)
 		if err != nil {
 			return &response, err
 		}

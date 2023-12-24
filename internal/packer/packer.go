@@ -13,11 +13,16 @@ import (
 	"github.com/dsha256/packer-pro/internal/entity"
 )
 
-const sortedSizesKeyName = "SortedSizes"
+const sortedSizesKeyName = "SortedSizesCache"
 
-// SortedSizesKey is a Redis key for SortedSizes keyspace.
+// SortedSizesKey is a Redis key for SortedSizesCache keyspace.
 type SortedSizesKey struct {
-	Name string
+	Name string `json:"name"`
+}
+
+// CalculatedSizesKey is a Redis key for CalculatedPacksCache keyspace.
+type CalculatedSizesKey struct {
+	Items int `json:"items"`
 }
 
 var (
@@ -26,9 +31,15 @@ var (
 		EvictionPolicy: cache.AllKeysLRU,
 	})
 
-	// SortedSizes is a Redis Keyspace.
-	SortedSizes = cache.NewListKeyspace[SortedSizesKey, int](Cache, cache.KeyspaceConfig{
+	// SortedSizesCache is a Redis Keyspace.
+	SortedSizesCache = cache.NewListKeyspace[SortedSizesKey, int](Cache, cache.KeyspaceConfig{
 		KeyPattern:    "sortedSizes/:Name",
+		DefaultExpiry: cache.ExpireIn(1 * time.Hour),
+	})
+
+	// CalculatedPacksCache caches already calculated pack sizes based on items.
+	CalculatedPacksCache = cache.NewStructKeyspace[CalculatedSizesKey, GetPacketsResp](Cache, cache.KeyspaceConfig{
+		KeyPattern:    "calculatedPacks/:Items",
 		DefaultExpiry: cache.ExpireIn(1 * time.Hour),
 	})
 
