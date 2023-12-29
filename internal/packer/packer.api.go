@@ -68,7 +68,7 @@ func (packer *Packer) GetPackets(ctx context.Context, items *GetPacketsReq) (*Ge
 
 // ListSizesResp ...
 type ListSizesResp struct {
-	SortedSizes []int `query:"sorted_sizes"`
+	SortedSizes []int `json:"sorted_sizes"`
 }
 
 //encore:api public method=GET path=/api/v1/packets/sizes
