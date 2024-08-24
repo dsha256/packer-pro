@@ -1,14 +1,14 @@
 module github.com/dsha256/packer-pro
 
-go 1.21.5
+go 1.23.0
 
 require (
 	encore.dev v1.27.0
-	entgo.io/ent v0.12.5
+	entgo.io/ent v0.14.1
 )
 
 require (
-	ariga.io/atlas v0.16.0 // indirect
+	ariga.io/atlas v0.19.1-0.20240203083654-5948b60a8e43 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/zclconf/go-cty v1.14.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 )
