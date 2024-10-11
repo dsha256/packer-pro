@@ -3,7 +3,7 @@ module github.com/dsha256/packer-pro
 go 1.21.5
 
 require (
-	encore.dev v1.27.0
+	encore.dev v1.41.9
 	entgo.io/ent v0.12.5
 )
 
